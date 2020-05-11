@@ -14,6 +14,8 @@ HPARAMS = {
         n_embd=768,
         n_head=12,
         n_layer=12,
+        threshold=0.6,
+        alpha=0.1
     ),
     'small': HParams(
         n_vocab=0,
@@ -21,6 +23,8 @@ HPARAMS = {
         n_embd=256,
         n_head=8,
         n_layer=8,
+        threshold=0.6,
+        alpha=0.1
     ),
     'tiny': HParams(
         n_vocab=0,
@@ -28,6 +32,8 @@ HPARAMS = {
         n_embd=64,
         n_head=4,
         n_layer=4,
+        threshold=0.6,
+        alpha=0.1
     ),
 }
 
@@ -209,8 +215,19 @@ def model(hparams, X, past=None, scope='model', reuse=False):
         pasts = tf.unstack(past, axis=1) if past is not None else \
             [None] * hparams.n_layer
         assert len(pasts) == hparams.n_layer
+        W1 = tf.get_variable(
+            'W1', [hparams.n_vocab, hparams.n_embd],
+            initializer=tf.random_normal_initializer(stddev=0.02))
+        W2 = tf.get_variable(
+            'W2', [hparams.n_vocab, hparams.n_embd],
+            initializer=tf.random_normal_initializer(stddev=0.02))
+        
         for layer, past in enumerate(pasts):
             co, h, present = block(co, h, 'h%d' % layer, past=past, hparams=hparams)
+            val = tf.tanh(W1*co + W2*h)
+            dec = tf.nn.softmax(val)
+            if(dec>hparams.threshold):
+                co = co-hparams.alpha*val
             presents.append(present)
         results['present'] = tf.stack(presents, axis=1)
         h = norm(h, 'ln_f')
