@@ -100,7 +100,7 @@ def attention_mask(nd, ns, *, dtype):
     return tf.cast(m, dtype)
 
 
-def attn(x, scope, n_state, *, past, hparams):
+def attn(co, x, scope, n_state, *, past, hparams):
     assert x.shape.ndims == 3  # Should be [batch, sequence, features]
     assert n_state % hparams.n_head == 0
     if past is not None:
@@ -124,9 +124,10 @@ def attn(x, scope, n_state, *, past, hparams):
         w = w*b - tf.cast(1e10, w.dtype)*(1-b)
         return w
 
-    def multihead_attn(q, k, v):
+    def multihead_attn(co, q, k, v):
         # q, k, v have shape [batch, heads, sequence, features]
-        w = tf.matmul(q, k, transpose_b=True)
+        w1 = tf.matmul(q, co, transpose_b=True)
+        w = tf.matmul(w1, k, transpose_b=True)
         w = w * tf.rsqrt(tf.cast(v.shape[-1].value, w.dtype))
 
         w = mask_attn_weights(w)
@@ -142,7 +143,7 @@ def attn(x, scope, n_state, *, past, hparams):
             pk, pv = tf.unstack(past, axis=1)
             k = tf.concat([pk, k], axis=-2)
             v = tf.concat([pv, v], axis=-2)
-        a = multihead_attn(q, k, v)
+        a = multihead_attn(co, q, k, v)
         a = merge_heads(a)
         a = conv1d(a, 'c_proj', n_state)
         return a, present
@@ -156,11 +157,12 @@ def mlp(x, scope, n_state):
         return h2
 
 
-def block(x, scope, *, past, hparams):
+def block(co, x, scope, *, past, hparams):
     with tf.variable_scope(scope):
         nx = x.shape[-1].value
-        a, present = attn(norm(x, 'ln_1'), 'attn', nx,
+        a, present = attn(co, norm(x, 'ln_1'), 'attn', nx,
                           past=past, hparams=hparams)
+        
         x = x + a
         m = mlp(norm(x, 'ln_2'), 'mlp', nx * 4)
         x = x + m
@@ -196,16 +198,19 @@ def model(hparams, X, past=None, scope='model', reuse=False):
         wte = tf.get_variable(
             'wte', [hparams.n_vocab, hparams.n_embd],
             initializer=tf.random_normal_initializer(stddev=0.02))
+        wce = tf.get_variable(
+            'wte', [hparams.n_vocab, hparams.n_embd],
+            initializer=tf.random_normal_initializer(stddev=0.02))
         past_length = 0 if past is None else tf.shape(past)[-2]
         h = tf.gather(wte, X) + tf.gather(wpe, positions_for(X, past_length))
-
+        co = wce 
         # Transformer
         presents = []
         pasts = tf.unstack(past, axis=1) if past is not None else \
             [None] * hparams.n_layer
         assert len(pasts) == hparams.n_layer
         for layer, past in enumerate(pasts):
-            h, present = block(h, 'h%d' % layer, past=past, hparams=hparams)
+            co, h, present = block(co, h, 'h%d' % layer, past=past, hparams=hparams)
             presents.append(present)
         results['present'] = tf.stack(presents, axis=1)
         h = norm(h, 'ln_f')
