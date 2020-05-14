@@ -173,7 +173,7 @@ def block(co, x, scope, *, past, hparams):
         x = x + a
         m = mlp(norm(x, 'ln_2'), 'mlp', nx * 4)
         x = x + m
-        return x, present
+        return co, x, present
 
 
 def past_shape(*, hparams, batch_size=None, sequence=None):
