@@ -209,7 +209,7 @@ def model(hparams, X, past=None, scope='model', reuse=False):
             initializer=tf.random_normal_initializer(stddev=0.02))
         past_length = 0 if past is None else tf.shape(past)[-2]
         h = tf.gather(wte, X) + tf.gather(wpe, positions_for(X, past_length))
-        co = wce 
+        co = tf.gather(wce, X) + tf.gather(wpe, positions_for(X, past_length))
         # Transformer
         presents = []
         pasts = tf.unstack(past, axis=1) if past is not None else \
