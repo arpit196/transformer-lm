@@ -223,13 +223,14 @@ def model(hparams, X, past=None, scope='model', reuse=False):
         W1 = tf.get_variable(
             'W1', [hparams.n_vocab, hparams.n_embd],
             initializer=tf.random_normal_initializer(stddev=0.02))
+        w1 = tf.gather(W1, X) + tf.gather(wpe, positions_for(X, past_length))
         W2 = tf.get_variable(
             'W2', [hparams.n_vocab, hparams.n_embd],
             initializer=tf.random_normal_initializer(stddev=0.02))
-        
+        w2 = tf.gather(W2, X) + tf.gather(wpe, positions_for(X, past_length))
         for layer, past in enumerate(pasts):
             co, h, present = block(co, h, 'h%d' % layer, past=past, hparams=hparams)
-            val = h*tf.tanh(W1*co + W2*h)
+            val = h*tf.tanh(w1*co + w2*h)
             dec = tf.cast(tf.nn.softmax(val), dtype=tf.float32)
             print(dec)
             #if(tf.math.greater(dec,hparams.threshold)):
