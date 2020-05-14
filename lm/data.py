@@ -21,6 +21,7 @@ def sp_train():
     arg('sp_model_prefix', help='path (prefix) to output sentencepiece model')
     arg('--vocab-size', type=int, default=50000)
     arg('--character-coverage', type=float, default=1.0)
+    arg('--hard_vocab_limit', default=false)
     args = parser.parse_args()
 
     sp_text = Path(args.sp_text)
@@ -53,6 +54,7 @@ def sp_train():
         f'--input={sp_text}',
         f'--model_prefix={args.sp_model_prefix}',
         f'--vocab_size={args.vocab_size}',
+        f'--hard_vocab_limit=false',
         f'--model_type=bpe',
         f'--max_sentence_length=16384',
         f'--bos_id=-1',
