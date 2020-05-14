@@ -144,6 +144,7 @@ def attn(co, x, scope, n_state, *, past, hparams):
     with tf.variable_scope(scope):
         c = conv1d(x, 'c_attn', n_state*3)
         q, k, v = map(split_heads, tf.split(c, 3, axis=2))
+        co = split_heads(co)
         present = tf.stack([k, v], axis=1)
         if past is not None:
             pk, pv = tf.unstack(past, axis=1)
