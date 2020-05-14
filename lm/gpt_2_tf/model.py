@@ -228,8 +228,9 @@ def model(hparams, X, past=None, scope='model', reuse=False):
             val = tf.tanh(W1*co + W2*h)
             dec = tf.cast(tf.nn.softmax(val), dtype=tf.float32)
             print(dec)
-            if(tf.math.greater(dec,hparams.threshold)):
-                co = co-hparams.alpha*val
+            #if(tf.math.greater(dec,hparams.threshold)):
+            #    co = co-hparams.alpha*val
+            co = tf.cond(tf.math.greater(dec,hparams.threshold), co = co-hparams.alpha*val, co)
             presents.append(present)
         results['present'] = tf.stack(presents, axis=1)
         h = norm(h, 'ln_f')
