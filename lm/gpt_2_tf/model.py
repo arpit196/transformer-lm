@@ -226,7 +226,7 @@ def model(hparams, X, past=None, scope='model', reuse=False):
         for layer, past in enumerate(pasts):
             co, h, present = block(co, h, 'h%d' % layer, past=past, hparams=hparams)
             val = tf.tanh(W1*co + W2*h)
-            dec = tf.cast(tf.nn.softmax(val), dtype=tf.int32)
+            dec = tf.cast(tf.nn.softmax(val), dtype=tf.float32)
             print(dec)
             if(dec>hparams.threshold):
                 co = co-hparams.alpha*val
