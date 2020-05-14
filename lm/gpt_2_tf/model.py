@@ -230,9 +230,10 @@ def model(hparams, X, past=None, scope='model', reuse=False):
             print(dec)
             #if(tf.math.greater(dec,hparams.threshold)):
             #    co = co-hparams.alpha*val
-            def f1() : return co-hparams.alpha*val
-            def f2() : return co
-            co = tf.cond(tf.math.greater(dec,hparams.threshold), f1, f2)
+            #def f1() : return co-hparams.alpha*val
+            #def f2() : return co
+            #co = tf.cond(tf.math.greater(dec,hparams.threshold), f1, f2)
+            co = co-hparams.alpha*val
             presents.append(present)
         results['present'] = tf.stack(presents, axis=1)
         h = norm(h, 'ln_f')
