@@ -232,16 +232,11 @@ def model(hparams, X, past=None, scope='model', reuse=False):
             co, h, present = block(co, h, 'h%d' % layer, past=past, hparams=hparams)
             val = h*tf.tanh(w1*co + w2*h)
             dec = tf.cast(tf.nn.softmax(val), dtype=tf.float32)
-            print(dec)
             #if(tf.math.greater(dec,hparams.threshold)):
             #    co = co-hparams.alpha*val
             #def f1() : return co-hparams.alpha*val
             #def f2() : return co
             #co = tf.cond(tf.math.greater(dec,hparams.threshold), f1, f2)
-            print("co")
-            print(co)
-            print("val")
-            print(val)
             co = co-hparams.alpha*val
             presents.append(present)
         results['present'] = tf.stack(presents, axis=1)
