@@ -134,12 +134,12 @@ def attn(co, x, scope, n_state, *, past, hparams):
         # q, k, v have shape [batch, heads, sequence, features]
         co_shape = co.get_shape().as_list()
         print(co_shape)
-        fourth = tf.math.sqrt(tf.cast(co_shape[3]*1.0,tf.float32))
-        co = tf.reshape(co, [-1,-1,-1, fourth , fourth])
-        print(co)
-        q=tf.expand_dims(q,axis=3)
-        w1 = tf.matmul(q, co)
-        w1 = tf.squeeze(w1,3)
+        #fourth = tf.math.sqrt(tf.cast(co_shape[3]*1.0,tf.float32))
+        #co = tf.reshape(co, [-1,-1,-1, fourth , fourth])
+        #print(co)
+        #q=tf.expand_dims(q,axis=3)
+        w1 = tf.math.multiply(q, co)
+        #w1 = tf.squeeze(w1,3)
         w = tf.matmul(w1, k, transpose_b=True)
         w = w * tf.rsqrt(tf.cast(v.shape[-1].value, w.dtype))
         w = mask_attn_weights(w)
@@ -212,13 +212,13 @@ def model(hparams, X, past=None, scope='model', reuse=False):
             'wte', [hparams.n_vocab, hparams.n_embd],
             initializer=tf.random_normal_initializer(stddev=0.02))
         wce = tf.get_variable(
-            'wce', [hparams.n_vocab, hparams.n_embd*64],
+            'wce', [hparams.n_vocab, hparams.n_embd],
             initializer=tf.random_normal_initializer(stddev=0.02))
         past_length = 0 if past is None else tf.shape(past)[-2]
         print("wce")
         print(wce)
         h = tf.gather(wte, X) + tf.gather(wpe, positions_for(X, past_length))
-        co = tf.gather(wce, X)# + tf.gather(wpe, positions_for(X, past_length))
+        co = tf.gather(wce, X) + tf.gather(wpe, positions_for(X, past_length))
         print("co")
         print(co)
         # Transformer
