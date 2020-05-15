@@ -138,7 +138,7 @@ def attn(co, x, scope, n_state, *, past, hparams):
         print(fourth)
         co = tf.reshape(co, [-1,-1,-1, fourth , fourth])
         print(co)
-        w1 = tf.tensordot(q, co, transpose_b=True)
+        w1 = tf.tensordot(q, co)
         w = tf.matmul(w1, k, transpose_b=True)
         w = w * tf.rsqrt(tf.cast(v.shape[-1].value, w.dtype))
         w = mask_attn_weights(w)
