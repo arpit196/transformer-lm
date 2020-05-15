@@ -133,10 +133,6 @@ def attn(co, x, scope, n_state, *, past, hparams):
     def multihead_attn(co, q, k, v):
         # q, k, v have shape [batch, heads, sequence, features]
         w1 = tf.matmul(q, co, transpose_b=True)
-        print("w1")
-        print(w1)
-        print("k")
-        print(k)
         w = tf.matmul(w1, k, transpose_b=True)
         w = w * tf.rsqrt(tf.cast(v.shape[-1].value, w.dtype))
         w = mask_attn_weights(w)
@@ -212,8 +208,12 @@ def model(hparams, X, past=None, scope='model', reuse=False):
             'wce', [hparams.n_vocab, hparams.n_embd],
             initializer=tf.random_normal_initializer(stddev=0.02))
         past_length = 0 if past is None else tf.shape(past)[-2]
+        print("wce")
+        print(wce)
         h = tf.gather(wte, X) + tf.gather(wpe, positions_for(X, past_length))
         co = tf.gather(wce, X) + tf.gather(wpe, positions_for(X, past_length))
+        print("co")
+        print(co)
         # Transformer
         presents = []
         pasts = tf.unstack(past, axis=1) if past is not None else \
