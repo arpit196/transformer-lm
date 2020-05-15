@@ -205,7 +205,7 @@ def model(hparams, X, past=None, scope='model', reuse=False):
             'wte', [hparams.n_vocab, hparams.n_embd],
             initializer=tf.random_normal_initializer(stddev=0.02))
         wce = tf.get_variable(
-            'wce', [hparams.n_vocab, hparams.n_embd],
+            'wce', [hparams.n_vocab, hparams.n_embd, hparams.n_embd],
             initializer=tf.random_normal_initializer(stddev=0.02))
         past_length = 0 if past is None else tf.shape(past)[-2]
         print("wce")
