@@ -211,7 +211,7 @@ def model(hparams, X, past=None, scope='model', reuse=False):
         print("wce")
         print(wce)
         h = tf.gather(wte, X) + tf.gather(wpe, positions_for(X, past_length))
-        co = tf.gather(wce, X) + tf.gather(wpe, positions_for(X, past_length))
+        co = tf.gather(wce, X)# + tf.gather(wpe, positions_for(X, past_length))
         print("co")
         print(co)
         # Transformer
