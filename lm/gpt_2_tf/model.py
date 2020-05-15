@@ -235,6 +235,10 @@ def model(hparams, X, past=None, scope='model', reuse=False):
             #def f1() : return co-hparams.alpha*val
             #def f2() : return co
             #co = tf.cond(tf.math.greater(dec,hparams.threshold), f1, f2)
+            print("co")
+            print(co)
+            print("val")
+            print(val)
             co = co-hparams.alpha*val
             presents.append(present)
         results['present'] = tf.stack(presents, axis=1)
