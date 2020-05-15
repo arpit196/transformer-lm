@@ -132,11 +132,9 @@ def attn(co, x, scope, n_state, *, past, hparams):
 
     def multihead_attn(co, q, k, v):
         # q, k, v have shape [batch, heads, sequence, features]
-        print("q")
-        print(q)
-        print("co")
-        print(co)
         w1 = tf.matmul(q, co, transpose_b=True)
+        print("w1")
+        print(w1)
         w = tf.matmul(w1, k, transpose_b=True)
         w = w * tf.rsqrt(tf.cast(v.shape[-1].value, w.dtype))
 
