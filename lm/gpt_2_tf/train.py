@@ -38,7 +38,7 @@ def train(
         restore_from=None,  # latest by default, or "path/model-STEP"
         save_every=1000,
         log_every=20,
-        config='default',
+        config='tiny',
         accum_gradients=1,  # accumulate gradients N times
         find_lr=False,  # instead of normal training, run lr range finder
         validate=False,  # instead of training, run validation and exit
