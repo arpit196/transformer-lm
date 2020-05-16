@@ -11,7 +11,7 @@ HPARAMS = {
     'default': HParams(
         n_vocab=0,
         n_ctx=1024,
-        n_embd=768,
+        n_embd=256,
         n_head=12,
         n_layer=12,
         threshold=0.6,
