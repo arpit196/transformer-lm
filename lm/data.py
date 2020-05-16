@@ -19,7 +19,7 @@ def sp_train():
     arg('sp_text', help='text file for sentencepiece model '
                         '(will be used as-is if exists)')
     arg('sp_model_prefix', help='path (prefix) to output sentencepiece model')
-    arg('--vocab-size', type=int, default=50000)
+    arg('--vocab-size', type=int, default=30000)
     arg('--character-coverage', type=float, default=1.0)
     arg('--hard_vocab_limit', default=False)
     args = parser.parse_args()
